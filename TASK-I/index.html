@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word to PDF Converter</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Convert Word document to PDF</h1>
+        <form id="upload-form">
+            <div class="form-group">
+                <label for="file-upload">Select a Word document to upload:</label>
+                <input type="file" class="form-control-file" id="file-upload" accept=".docx">
+            </div>
+            <div class="form-group text-center">
+                <button type="submit" class="btn btn-primary">Convert to PDF</button>
+            </div>
+        </form>
+        <div id="result" class="mt-4"></div>
+    </div>
+    <!-- jQuery and Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.807.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        $(document).ready(function() {
+            AWS.config.update({
+                accessKeyId: 'AKIA5FLS2R4OVJPJQVDU',
+                secretAccessKey: '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',
+                region: 'ap-south-1',
+            });
+
+            $('#upload-form').submit(function(event) {
+                event.preventDefault(); // Prevent default form submission behavior
+                var formData = new FormData();
+                formData.append('file_name', $('#file-upload')[0].files[0].name);
+                formData.append('body', $('#file-upload')[0].files[0]);
+                fetch('https://y0dc4mucb3.execute-api.ap-south-1.amazonaws.com/dev/web3versedocx2pdf', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.status == 200) {
+                        $('#result').html('<div class="alert alert-success" role="alert">Conversion successful!</div>');
+                    } else {
+                        $('#result').html('<div class="alert alert-danger" role="alert">Conversion failed: ' + response.statusText + '</div>');
+                    }
+                })
+                .catch(error => {
+                    $('#result').html('<div class="alert alert-danger" role="alert">Conversion failed: ' + error.message + '</div>');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
